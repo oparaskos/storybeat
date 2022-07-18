@@ -19,34 +19,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
 IN THE SOFTWARE.
 */
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 .Script {
 	max-width: 1280px;
 	margin: 0 auto;
-	padding: 0;
+	padding: 0 3rem;
 	box-shadow: 0 10px 10px #3333;
 }
-* {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-}
-html {
-	margin: 0;
-	padding: 0;
-}
-body {
+
+article.fountain {
 	background-color: #fff;
 	color: #3e3e3e;
-	font: 14px/1.3em 'Courier', serif;
+	font-size: 14px;
+	line-height: 1.3em;
+	font-family: 'Courier Prime', 'Courier', monospace;
 	padding: 0;
 	margin: 0;
-}
-article {
-	padding: 40px 0;
-	margin: 0;
+	text-align: left;
 }
 section {
 	padding: 0 0 0 0px;
-	width: 465px;
+	max-width: 50rem;
 	margin-right: auto;
 	margin-left: auto;
 }
@@ -67,7 +61,10 @@ body > p:first-child {
 }
 
 .transition {
+	font-size: 1.1rem;
+	display: block;
 	text-align: right;
+	font-weight: bold;
 }
 
 .new-act, .end-of-act {
@@ -75,18 +72,18 @@ body > p:first-child {
 }
 
 .character {
-	margin: 1.3em auto 0;
-	width: 180px;
+	display: block;
+	margin-top: 1.3em;
+	text-align: center;
+	font-weight: bold;
 }
 
 .dialogue {
-	margin: 0 auto;
-	width: 310px;
+	text-align: center;
 }
 
 .parenthetical {
-	margin: 0 auto;
-	width: 250px;
+	margin-top:0;
 }
 
 .scene-heading {
@@ -117,23 +114,6 @@ body > p:first-child {
 	font-weight: bold;
 	text-transform: uppercase;
 }
-#script-title .credit {
-	text-align: center;
-}
-#script-title .authors {
-	text-align: center;
-}
-#script-title .source {
-	text-align: center;
-	padding-top: 1.3em;
-}
-#script-title .notes {
-	padding-top: 2.6em;
-}
-#script-title .notes {
-	white-space: pre-line !important;
-    /* shape-rendering */
-}
 .center {
 	text-align: center !important;
 }
@@ -143,13 +123,11 @@ hr {
     border-bottom: 1px solid #ccc;
 }
 .dual-dialogue {
-	overflow: hidden;
+	display:flex;
+	flex-direction: row;
+	justify-content: center;
 }
-.dual-dialogue .dual-dialogue-left,
-.dual-dialogue .dual-dialogue-right {
-	width: 228px;
-	float: left;
-}
+
 .dual-dialogue p {
 	width: auto;
 }
@@ -177,4 +155,15 @@ p.page-break {
 
 .italic {
 	font-style: italic;
+}
+
+.prefix, .suffix {
+	font-size: 0.9;
+	color: #ccc;
+	display: inline-block;
+	margin-right: 0.3em;
+}
+
+h1.section-heading {
+	font-size: 1.75em;
 }

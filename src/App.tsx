@@ -3,43 +3,58 @@ import './App.css';
 import { FountainScript } from './fountain/FountainScript';
 
 const fountainFile = `
-Title:	**THE LAST BIRTHDAY CARD**
-Credit:	Written by
-Author:	Stu Maschwitz
-Draft date:	7/8/1998
+Title:
+    BRICK & STEEL
+    FULL RETIRED
+Credit: Written by
+Author: Stu Maschwitz
+Source: Story by KTM
+Draft date: 1/20/2012
 Contact:
-	PO Box 10031
-	San Rafael CA 94912
-	Registered WGAw No. 701428
+    Next Level Productions
+    1588 Mission Dr.
+    Solvang, CA 93463
 
-# ACT I
+EXT. BRICK'S PATIO - DAY
 
-= Meet the players and set up the world. Two hit men with very different lives.
+A gorgeous day.  The sun is shining.  But BRICK BRADDOCK, retired police detective, is sitting quietly, contemplating -- something.
 
-## Meet Scott
+The SCREEN DOOR slides open and DICK STEEL, his former partner and fellow retiree, emerges with two cold beers.
 
-= And his friend Baxter.
+STEEL
+Beer's ready!
 
-### Scott's SF Apartment
+BRICK
+Are they cold?
 
-Scott exasperatedly throws down the card on the table and picks up the phone, hitting speed dial #1...
+STEEL
+Does a bear crap in the woods?
 
-CUT TO:
+Steel sits.  They laugh at the dumb joke.
 
-### Baxter's Music Studio
+STEEL
+(beer raised)
+To retirement.
 
-## Meet Nak
+BRICK
+To retirement.
 
-blah
+They drink long and well from the beers.
 
-# Nak's Home
+And then there's a long beat.  
+Longer than is funny.  
+Long enough to be depressing.
 
-MALE VOICE
-Is this Scott?  Listen I saw your work at Nak's, and...
+The men look at each other.
 
-> FADE OUT.
+STEEL
+Screw retirement.
 
->THE END<`;
+BRICK ^
+Screw retirement.
+
+SMASH CUT TO:
+`;
 
 function App() {
   return (
