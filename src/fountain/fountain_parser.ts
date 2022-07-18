@@ -10,7 +10,7 @@ var regex = {
     scene_heading: /^((?:\*{0,3}_?)?(?:(?:int|ext|est|i\/e)[. ]).+)|^(?:\.(?!\.+))(.+)/i,
     scene_number: /( *#(.+)# *)/,
 
-    transition: /^((?:FADE (?:TO BLACK|OUT)|CUT TO BLACK)\.|.+ TO:)|^(?:> *)(.+)/,
+    transition: /^((?:FADE (?:TO BLACK|OUT)|CUT TO BLACK)\.|.+ TO:)$|^(?:> *)(.+)/,
 
     dialogue: /^([A-Z*_]+[0-9A-Z (._\-')]*)(\^?)?(?:\n(?!\n+))([\s\S]+)/,
     parenthetical: /^(\(.+\))$/,
@@ -96,7 +96,7 @@ export var tokenize = function (script: string) {
         // transitions
         match = line.match(regex.transition)
         if (match) {
-            tokens.push({ type: 'transition', text: match[1] || match[2] });
+            tokens.push({ type: 'transition', text: line });
             continue;
         }
 

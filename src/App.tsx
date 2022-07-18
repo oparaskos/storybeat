@@ -53,8 +53,7 @@ Screw retirement.
 BRICK ^
 Screw retirement.
 
-SMASH CUT TO:
-`;
+SMASH CUT TO:`;
 
 function App() {
   return (

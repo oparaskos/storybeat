@@ -1,10 +1,14 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import slugify from 'slugify';
 import { tokenize } from './fountain_parser';
 import { FountainToken } from "./types/FountainTokenType";
 
 export function FountainSnippet({ script }: { script: string }) {
-    var tokens = tokenize(script);
+    const [tokens, setTokens] = useState(tokenize(script));
+    useEffect(() => {
+        setTokens(tokenize(script));
+    }, [script]);
+    console.log(script);
     return <article className='fountain'>
         <FountainTokens tokens={tokens} />
     </article>;
@@ -21,51 +25,55 @@ function tokensBetween(tokens: Array<FountainToken>, index: number, end_type: st
 }
 
 function FountainTokens({ tokens, parent = null }: { tokens: Array<FountainToken>, parent?: FountainToken | null }) {
-    const html: React.ReactNode[] = [];
-    for (let i = 0; i < tokens.length; ++i) {
-        const token = tokens[i];
-        // const tokenText = textTransformer(token.text);
+    const [result, setResult] = useState<React.ReactNode[]>([]);
+    useEffect(() => {
+        const html: React.ReactNode[] = [];
+        for (let i = 0; i < tokens.length; ++i) {
+            const token = tokens[i];
+            // const tokenText = textTransformer(token.text);
 
-        switch (token.type) {
-            case 'title_page_property':
-                // Gather tokens from the next token until the end of the section (the beginning of the next section at this depth or one above. or the end of the file)
-                const [titlePageTokens, titlePageEnd] = tokensBetween(tokens, i - 1, 'end_title_page');
-                html.push(<div id="script-title" key={i}>
-                    {titlePageTokens.map((it, j) => <TitlePageProperty token={it} key={j} />)}
-                </div>);
-                i = titlePageEnd - 1;
-                break;
-            case 'section':
-                // Gather tokens from the next token until the end of the section (the beginning of the next section at this depth or one above. or the end of the file)
-                const tokenDepth = token.depth || 1;
-                const [sectionTokens, sectionEnd] = tokensBetween(tokens, i, 'section', (t) => (t.depth as number) <= tokenDepth);
-                html.push(<Section key={i} token={token}>
-                    <FountainTokens tokens={sectionTokens} parent={token} />
-                </Section>);
-                i = sectionEnd - 1;
-                break;
-            case 'dual_dialogue_begin':
-                const [dualDialogueTokens, dualDialogueEnd] = tokensBetween(tokens, i, 'dual_dialogue_end');
-                html.push(<div key={i} className={`dual-dialogue`}><FountainTokens tokens={dualDialogueTokens} parent={token} /></div>);
-                i = dualDialogueEnd;
-                break;
-            case 'dialogue_begin':
-                const [dialogueTokens, dialogueEnd] = tokensBetween(tokens, i, 'dialogue_end');
-                html.push(<div key={i} className="dialogue" data-dual={token.dual}><FountainTokens tokens={dialogueTokens} parent={token} /></div>);
-                i = dialogueEnd;
-                break;
-            case 'boneyard_begin':
-            case 'boneyard_end':
-            case 'dialogue_end':
-            case 'dual_dialogue_end':
-                break;
-            default:
-                const TokenComponent = tokenToComponent(token);
-                html.push(<TokenComponent key={i} token={token} parent={parent} />);
+            switch (token.type) {
+                case 'title_page_property':
+                    // Gather tokens from the next token until the end of the section (the beginning of the next section at this depth or one above. or the end of the file)
+                    const [titlePageTokens, titlePageEnd] = tokensBetween(tokens, i - 1, 'end_title_page');
+                    html.push(<div id="script-title" key={i}>
+                        {titlePageTokens.map((it, j) => <TitlePageProperty token={it} key={j} />)}
+                    </div>);
+                    i = titlePageEnd - 1;
+                    break;
+                case 'section':
+                    // Gather tokens from the next token until the end of the section (the beginning of the next section at this depth or one above. or the end of the file)
+                    const tokenDepth = token.depth || 1;
+                    const [sectionTokens, sectionEnd] = tokensBetween(tokens, i, 'section', (t) => (t.depth as number) <= tokenDepth);
+                    html.push(<Section key={i} token={token}>
+                        <FountainTokens tokens={sectionTokens} parent={token} />
+                    </Section>);
+                    i = sectionEnd - 1;
+                    break;
+                case 'dual_dialogue_begin':
+                    const [dualDialogueTokens, dualDialogueEnd] = tokensBetween(tokens, i, 'dual_dialogue_end');
+                    html.push(<div key={i} className={`dual-dialogue`}><FountainTokens tokens={dualDialogueTokens} parent={token} /></div>);
+                    i = dualDialogueEnd;
+                    break;
+                case 'dialogue_begin':
+                    const [dialogueTokens, dialogueEnd] = tokensBetween(tokens, i, 'dialogue_end');
+                    html.push(<div key={i} className="dialogue" data-dual={token.dual}><FountainTokens tokens={dialogueTokens} parent={token} /></div>);
+                    i = dialogueEnd;
+                    break;
+                case 'boneyard_begin':
+                case 'boneyard_end':
+                case 'dialogue_end':
+                case 'dual_dialogue_end':
+                    break;
+                default:
+                    const TokenComponent = tokenToComponent(token);
+                    html.push(<TokenComponent key={i} token={token} parent={parent} />);
+            }
         }
-    }
+        setResult(html)
+    }, [tokens, parent]);
 
-    return <>{html}</>;
+    return <>{result}</>;
 };
 
 
@@ -126,7 +134,11 @@ function SceneHeading({ token, parent }: { token: FountainToken, parent?: Founta
 }
 
 function Transition({ token, parent }: { token: FountainToken, parent?: FountainToken | null }) {
-    return <span className='transition'><FormattedText token={token} /></span>;
+    let text = (token.text || '').trim();
+    const usePrefix = text.startsWith('>');
+    const newToken = {...token, text: text.replace(/^>/, '')};
+    
+    return <span className='transition'><FormattedText prefix={usePrefix ? '>' : ''} token={newToken} /></span>;
 }
 
 function Character({ token, parent }: { token: FountainToken, parent?: FountainToken | null }) {
