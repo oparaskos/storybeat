@@ -1,73 +1,74 @@
-import React  from 'react';
+import React, { useCallback, useState }  from 'react';
 import './App.css';
 import { FountainScript } from './fountain/FountainScript';
 
-const fountainFile = `
-Title:
-    BRICK & STEEL
-    FULL RETIRED
-Credit: Written by
-Author: Stu Maschwitz
-Source: Story by KTM
-Draft date: 1/20/2012
-Contact:
-    Next Level Productions
-    1588 Mission Dr.
-    Solvang, CA 93463
+const DEFAULT_SCRIPT = `
+Title: Fountain Script
 
-EXT. BRICK'S PATIO - DAY
+# Heading 1
 
-A gorgeous day.  The sun is shining.  But BRICK BRADDOCK, retired police detective, is sitting quietly, contemplating -- something.
+## Heading 2
 
-The SCREEN DOOR slides open and DICK STEEL, his former partner and fellow retiree, emerges with two cold beers.
+PETER
+Who do you work for!?
 
-STEEL
-Beer's ready!
+VICTIM
+I work for the government.
 
-BRICK
-Are they cold?
+VICTIM (CONT'D)
+If you let me go I...
 
-STEEL
-Does a bear crap in the woods?
+PETER ^
+(Angrily)
+Which government?!
 
-Steel sits.  They laugh at the dumb joke.
+> CENTERED **BOLD** *ITALIC* _underlined_ <
 
-STEEL
-(beer raised)
-To retirement.
+> TRANSITION
 
-BRICK
-To retirement.
+Some Action
 
-They drink long and well from the beers.
+CUT TO:
 
-And then there's a long beat.  
-Longer than is funny.  
-Long enough to be depressing.
+= Something else happens
 
-The men look at each other.
-
-STEEL
-Screw retirement.
-
-BRICK ^
-Screw retirement.
-
-SMASH CUT TO:`;
+`;
 
 function App() {
+  const [script, setScript] = useState(DEFAULT_SCRIPT);
+  const openFile = useCallback((changeEvent: React.ChangeEvent<HTMLInputElement>) => {
+    const file = changeEvent.target?.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        console.log(e)
+        const result = e?.target?.result;
+        if (typeof(result) === "string") {
+          setScript(result);
+        } else if (result instanceof ArrayBuffer) {
+          setScript(new TextDecoder().decode(result));
+        }
+      }
+      reader.readAsText(file);
+    }
+  }, [setScript])
   return (
     <div className="App">
-      <FountainScript fountain={fountainFile}/>
-      <header className="App-header">
-        <a
-          href="https://fountain.iohttps://fountain.io/syntax"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Fountain Syntax
-        </a>
-      </header>
+      <input type="file" onChange={openFile}></input>
+      <FountainScript fountain={script}/>
+      <br />
+      <hr />
+
+      <br />
+      <a
+        href="https://fountain.iohttps://fountain.io/syntax"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Fountain Syntax
+      </a>
+      <br />
+      <hr />
     </div>
   );
 }
