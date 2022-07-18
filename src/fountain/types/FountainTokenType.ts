@@ -9,3 +9,9 @@ export interface FountainToken {
     dual?: 'left' | 'right';
     key?: string;
 }
+
+export interface OutlineNode {
+    type: 'section' | 'scene';
+    title: string;
+    children: OutlineNode[];
+}

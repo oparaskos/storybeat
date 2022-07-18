@@ -1,18 +1,78 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import slugify from 'slugify';
+import { StoryCharacter } from '../Story';
 import { tokenize } from './fountain_parser';
-import { FountainToken } from "./types/FountainTokenType";
+import { FountainToken, OutlineNode } from "./types/FountainTokenType";
 
-export function FountainSnippet({ script }: { script: string }) {
+export interface FountainScriptProps {
+    script: string;
+    onCharacters: (characters: StoryCharacter[]) => void;
+    onOutline: (outline: OutlineNode[]) => void;
+};
+
+export function FountainSnippet({ script, onCharacters, onOutline }: FountainScriptProps) {
     const [tokens, setTokens] = useState(tokenize(script));
+
     useEffect(() => {
-        setTokens(tokenize(script));
-    }, [script]);
-    console.log(script);
+        const updatedTokens = tokenize(script)
+        const characters = updatedTokens.map((token) => {
+            if (token.text && token.type === "character") {
+                const name = token.text.replace(/\([^)]+\)$/g, '').trim();
+                return { name } as StoryCharacter;
+            } else {
+                return null;
+            }
+        })
+        .filter((character, index, self) => self.findIndex((c) => c?.name === character?.name) === index)
+        .filter((character) => character !== null) as StoryCharacter[];
+        onCharacters(characters);
+        onOutline(describeOutline(updatedTokens, null));
+        setTokens(updatedTokens);
+    }, [script, setTokens, onCharacters, onOutline]);
+
+    
+
     return <article className='fountain'>
-        <FountainTokens tokens={tokens} />
-    </article>;
+            <FountainTokens tokens={tokens} />
+        </article>;
 }
+
+
+function describeOutline(tokens: FountainToken[], parent: null | FountainToken = null): OutlineNode[] {
+    const data: OutlineNode[] = [];
+    for (let i = 0; i < tokens.length; ++i) {
+        const token = tokens[i];
+        const tokenDepth = token.depth || parent?.depth || 1;
+        switch (token.type) {
+            case 'section':
+                const [sectionTokens, sectionEnd] = tokensBetween(tokens, i, 'section', (t) => (t.depth as number) <= tokenDepth);
+                data.push({
+                    type: 'section',
+                    title: token.text || 'UNTITLED',
+                    children: describeOutline(sectionTokens, token)
+                });
+                i = sectionEnd - 1;
+                break;
+            case 'scene_heading':
+                // Go to the next scene heading or section start whichever is closest.
+                const [sceneTokens, sceneEnd] = tokensBetween(tokens, i, 'scene_heading');
+                const [sceneSectionTokens, sceneSectionEnd] = tokensBetween(tokens, i, 'section', (t) => (t.depth as number) <= tokenDepth);
+                const end = sceneTokens.length < sceneSectionTokens.length ? sceneEnd : sceneSectionEnd;
+                const toks = sceneTokens.length < sceneSectionTokens.length ? sceneTokens : sceneSectionTokens;
+                data.push({
+                    type: 'scene',
+                    title: token.text || 'UNTITLED',
+                    children: describeOutline(toks, token)
+                });
+                i = end - 1;
+                break;
+
+            default:
+                continue;
+        }
+    }
+    return data;
+};
 
 function tokensBetween(tokens: Array<FountainToken>, index: number, end_type: string, predicate = (t: FountainToken, i: number) => true): [Array<FountainToken>, number] {
     const endIndex = tokens.findIndex((t, idx) => idx > index && t.type === end_type && predicate(t, idx));
